@@ -1,0 +1,100 @@
+{
+  "type": "record",
+  "name": "discount_codes_value",
+  "namespace": "mdh.pricing",
+  "doc": "GERADO (spike) a partir de contracts/domains/pricing/discount_codes.yaml — espelha dh_landing.pricing__discount_codes_raw (menos _ingested_at).",
+  "fields": [
+    {
+      "name": "discount_code",
+      "type": "string"
+    },
+    {
+      "name": "campaign_name",
+      "type": "string"
+    },
+    {
+      "name": "discount_type",
+      "type": "string"
+    },
+    {
+      "name": "discount_value",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 4
+      }
+    },
+    {
+      "name": "valid_from",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "valid_to",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "max_uses",
+      "type": "long"
+    },
+    {
+      "name": "business_unit_scope",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_topic",
+      "type": "string"
+    },
+    {
+      "name": "_partition",
+      "type": "int"
+    },
+    {
+      "name": "_offset",
+      "type": "long"
+    },
+    {
+      "name": "_kafka_ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_op",
+      "type": "string"
+    },
+    {
+      "name": "_cdc_seq",
+      "type": "long"
+    },
+    {
+      "name": "_schema_id",
+      "type": "int"
+    }
+  ]
+}

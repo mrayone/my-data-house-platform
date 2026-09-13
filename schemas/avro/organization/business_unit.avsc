@@ -1,0 +1,84 @@
+{
+  "type": "record",
+  "name": "business_unit_value",
+  "namespace": "mdh.organization",
+  "doc": "GERADO (spike) a partir de contracts/domains/organization/business_unit.yaml — espelha dh_landing.organization__business_unit_raw (menos _ingested_at).",
+  "fields": [
+    {
+      "name": "bu_code",
+      "type": "string"
+    },
+    {
+      "name": "bu_name",
+      "type": "string"
+    },
+    {
+      "name": "channel",
+      "type": "string"
+    },
+    {
+      "name": "region",
+      "type": "string"
+    },
+    {
+      "name": "country",
+      "type": "string"
+    },
+    {
+      "name": "cost_center",
+      "type": "string"
+    },
+    {
+      "name": "active",
+      "type": {
+        "type": "int",
+        "connect.type": "int8"
+      }
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_topic",
+      "type": "string"
+    },
+    {
+      "name": "_partition",
+      "type": "int"
+    },
+    {
+      "name": "_offset",
+      "type": "long"
+    },
+    {
+      "name": "_kafka_ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_op",
+      "type": "string"
+    },
+    {
+      "name": "_cdc_seq",
+      "type": "long"
+    },
+    {
+      "name": "_schema_id",
+      "type": "int"
+    }
+  ]
+}

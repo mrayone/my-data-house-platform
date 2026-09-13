@@ -1,0 +1,108 @@
+{
+  "type": "record",
+  "name": "order_payment_value",
+  "namespace": "mdh.sales",
+  "doc": "GERADO (spike) a partir de contracts/domains/sales/order_payment.yaml — espelha dh_landing.sales__order_payment_raw (menos _ingested_at).",
+  "fields": [
+    {
+      "name": "payment_id",
+      "type": "string"
+    },
+    {
+      "name": "order_id",
+      "type": "string"
+    },
+    {
+      "name": "payment_method",
+      "type": "string"
+    },
+    {
+      "name": "installments",
+      "type": "int"
+    },
+    {
+      "name": "payment_status",
+      "type": "string"
+    },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 4
+      }
+    },
+    {
+      "name": "acquirer",
+      "type": "string"
+    },
+    {
+      "name": "authorized_at",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "captured_at",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_topic",
+      "type": "string"
+    },
+    {
+      "name": "_partition",
+      "type": "int"
+    },
+    {
+      "name": "_offset",
+      "type": "long"
+    },
+    {
+      "name": "_kafka_ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_op",
+      "type": "string"
+    },
+    {
+      "name": "_cdc_seq",
+      "type": "long"
+    },
+    {
+      "name": "_schema_id",
+      "type": "int"
+    }
+  ]
+}

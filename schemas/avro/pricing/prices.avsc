@@ -1,0 +1,101 @@
+{
+  "type": "record",
+  "name": "prices_value",
+  "namespace": "mdh.pricing",
+  "doc": "GERADO (spike) a partir de contracts/domains/pricing/prices.yaml — espelha dh_landing.pricing__prices_raw (menos _ingested_at).",
+  "fields": [
+    {
+      "name": "item_id",
+      "type": "string"
+    },
+    {
+      "name": "price_list_id",
+      "type": "string"
+    },
+    {
+      "name": "currency",
+      "type": "string"
+    },
+    {
+      "name": "list_price",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 4
+      }
+    },
+    {
+      "name": "cost_price",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 4
+      }
+    },
+    {
+      "name": "valid_from",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "valid_to",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_topic",
+      "type": "string"
+    },
+    {
+      "name": "_partition",
+      "type": "int"
+    },
+    {
+      "name": "_offset",
+      "type": "long"
+    },
+    {
+      "name": "_kafka_ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_op",
+      "type": "string"
+    },
+    {
+      "name": "_cdc_seq",
+      "type": "long"
+    },
+    {
+      "name": "_schema_id",
+      "type": "int"
+    }
+  ]
+}

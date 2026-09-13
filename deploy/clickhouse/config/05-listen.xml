@@ -1,0 +1,10 @@
+<!--
+  A imagem oficial traz um docker_related_config.xml em config.d com
+  listen_host aberto — mas o volume mount de ./deploy/clickhouse/config
+  SUBSTITUI o diretório inteiro, derrubando esse arquivo. Sem isto, o
+  servidor só escuta em localhost e o Kafka Connect (outro container)
+  recebe Connection refused.
+-->
+<clickhouse>
+    <listen_host>0.0.0.0</listen_host>
+</clickhouse>

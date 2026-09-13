@@ -1,0 +1,88 @@
+{
+  "type": "record",
+  "name": "stock_position_value",
+  "namespace": "mdh.inventory",
+  "doc": "GERADO (spike) a partir de contracts/domains/inventory/stock_position.yaml — espelha dh_landing.inventory__stock_position_raw (menos _ingested_at).",
+  "fields": [
+    {
+      "name": "item_id",
+      "type": "string"
+    },
+    {
+      "name": "dc_id",
+      "type": "string"
+    },
+    {
+      "name": "dc_name",
+      "type": "string"
+    },
+    {
+      "name": "on_hand",
+      "type": "long"
+    },
+    {
+      "name": "reserved",
+      "type": "long"
+    },
+    {
+      "name": "available",
+      "type": "long"
+    },
+    {
+      "name": "safety_stock",
+      "type": "long"
+    },
+    {
+      "name": "position_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_topic",
+      "type": "string"
+    },
+    {
+      "name": "_partition",
+      "type": "int"
+    },
+    {
+      "name": "_offset",
+      "type": "long"
+    },
+    {
+      "name": "_kafka_ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_op",
+      "type": "string"
+    },
+    {
+      "name": "_cdc_seq",
+      "type": "long"
+    },
+    {
+      "name": "_schema_id",
+      "type": "int"
+    }
+  ]
+}

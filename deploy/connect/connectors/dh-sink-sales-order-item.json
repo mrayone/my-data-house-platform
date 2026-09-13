@@ -1,0 +1,23 @@
+{
+  "_generated_from": "contracts/domains/sales/order_item.yaml (spike Fase 03 — manual; definitivo vem de dhctl generate)",
+  "name": "dh-sink-sales-order-item",
+  "config": {
+    "connector.class": "com.clickhouse.kafka.connect.ClickHouseSinkConnector",
+    "tasks.max": "1",
+    "topics": "sap.sales.order_item.v1",
+    "hostname": "clickhouse",
+    "port": "8123",
+    "database": "dh_landing",
+    "username": "default",
+    "password": "${CLICKHOUSE_PASSWORD}",
+    "topic2TableMap": "sap.sales.order_item.v1=sales__order_item_raw",
+    "exactlyOnce": "true",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "dh-dlq-sap.sales.order_item.v1",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true"
+  }
+}

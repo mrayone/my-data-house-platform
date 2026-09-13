@@ -1,0 +1,96 @@
+{
+  "type": "record",
+  "name": "customer_value",
+  "namespace": "mdh.customer",
+  "doc": "GERADO (spike) a partir de contracts/domains/customer/customer.yaml — espelha dh_landing.customer__customer_raw (menos _ingested_at).",
+  "fields": [
+    {
+      "name": "customer_id",
+      "type": "string"
+    },
+    {
+      "name": "document_hash",
+      "type": "string"
+    },
+    {
+      "name": "first_name",
+      "type": "string"
+    },
+    {
+      "name": "email_hash",
+      "type": "string"
+    },
+    {
+      "name": "customer_since",
+      "type": {
+        "type": "int",
+        "logicalType": "date"
+      }
+    },
+    {
+      "name": "segment",
+      "type": "string"
+    },
+    {
+      "name": "loyalty_tier",
+      "type": "string"
+    },
+    {
+      "name": "city",
+      "type": "string"
+    },
+    {
+      "name": "state",
+      "type": "string"
+    },
+    {
+      "name": "zipcode",
+      "type": "string"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_topic",
+      "type": "string"
+    },
+    {
+      "name": "_partition",
+      "type": "int"
+    },
+    {
+      "name": "_offset",
+      "type": "long"
+    },
+    {
+      "name": "_kafka_ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "_op",
+      "type": "string"
+    },
+    {
+      "name": "_cdc_seq",
+      "type": "long"
+    },
+    {
+      "name": "_schema_id",
+      "type": "int"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "_generated_from": "contracts/domains/pricing/discount_codes.yaml (spike Fase 03 — manual; definitivo vem de dhctl generate)",
+  "name": "dh-sink-pricing-discount-codes",
+  "config": {
+    "connector.class": "com.clickhouse.kafka.connect.ClickHouseSinkConnector",
+    "tasks.max": "1",
+    "topics": "sap.pricing.discount_codes.v1",
+    "hostname": "clickhouse",
+    "port": "8123",
+    "database": "dh_landing",
+    "username": "default",
+    "password": "${CLICKHOUSE_PASSWORD}",
+    "topic2TableMap": "sap.pricing.discount_codes.v1=pricing__discount_codes_raw",
+    "exactlyOnce": "true",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "dh-dlq-sap.pricing.discount_codes.v1",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true"
+  }
+}
