@@ -122,6 +122,52 @@ services:
       retries: 20
       start_period: 15s
 
+  kafka-connect:
+    build:
+      context: ./deploy/connect
+      dockerfile: Dockerfile
+    image: my-data-house-platform/kafka-connect:1.5.0
+    container_name: dh-kafka-connect
+    hostname: kafka-connect
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:29092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: dh-connect-cluster
+      CONNECT_CONFIG_STORAGE_TOPIC: dh-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: dh-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: dh-connect-status
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components,/opt/dh-plugins
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      # DLQ obrigatória (deploy/CLAUDE.md #5) — mensagem malformada nunca é
+      # descartada em silêncio. Nome final do tópico é por-connector, definido
+      # na config gerada (dhctl generate); isto é só o valor default.
+      CONNECT_ERRORS_TOLERANCE: all
+      CONNECT_ERRORS_DEADLETTERQUEUE_TOPIC_NAME: dh-dlq-default
+      CONNECT_ERRORS_DEADLETTERQUEUE_TOPIC_REPLICATION_FACTOR: 1
+      CONNECT_ERRORS_DEADLETTERQUEUE_CONTEXT_HEADERS_ENABLE: "true"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8083/connectors"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
 volumes:
   clickhouse-data:
