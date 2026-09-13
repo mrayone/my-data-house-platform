@@ -76,6 +76,8 @@ internal/                  <- código Go. Tem CLAUDE.md próprio.
   reporting/               <- execução de queries e HTTP handlers
   contexts/<contexto>/     <- CADA CONTEXTO É AUTOCONTIDO: generator/, reports/, sql/
 cmd/                       <- dhctl, producer, api
+scripts/                   <- shell chamado pelos alvos do Makefile (checks, db, kafka, mock)
+out/                       <- artefatos gerados em runtime (gitignored)
 test/                      <- e2e e fixtures
 ```
 
@@ -85,6 +87,9 @@ test/                      <- e2e e fixtures
 |---|---|
 | Por que a ingestão é via Kafka Connect? | `docs/adr/0002-*.md` |
 | Como as camadas L0→L3 funcionam? | `docs/architecture/layered-model.md` + `docs/adr/0001` |
+| Como N tópicos convergem num agregado (fan-in)? | `docs/architecture/fan-in.md` |
+| Como os dados ficam em disco (engines, parts, TTL)? | `docs/architecture/storage.md` |
+| O que existe em cada pasta do repo? | `docs/architecture/repository-structure.md` |
 | Como plugo um tópico novo? | `docs/runbooks/add-new-topic.md` |
 | Como trato evento fora de ordem / delete? | `docs/adr/0004-*.md` |
 | Posso fazer JOIN dentro de uma MV? | `docs/adr/0005-*.md` (**leia antes de escrever MV**) |

@@ -1,6 +1,8 @@
 # Fluxo de dados
 
 O caminho de uma mensagem, e — mais útil — o que acontece nos casos difíceis.
+A visão inversa — como **vários** tópicos convergem num agregado — está em
+[`fan-in.md`](fan-in.md); a física do armazenamento, em [`storage.md`](storage.md).
 
 ## 1. Caminho feliz
 
@@ -9,7 +11,8 @@ SAP  ──CDC──>  Datasphere  ──Avro+SR──>  Confluent topic
                                               │
                                     Kafka Connect Sink
                                     · AvroConverter resolve schema_id no SR
-                                    · SMT KeyToValue materializa a chave
+                                    · key = chave de negócio (particionamento);
+                                      o envelope CDC viaja no value
                                     · batch -> INSERT
                                     · offset + estado no KeeperMap (exactly-once)
                                               ▼
