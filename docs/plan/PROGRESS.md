@@ -71,7 +71,7 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 
 | Tarefa | Status | Data | Commit | Observação |
 |---|---|---|---|---|
-| P01-T01 — ClickHouse e Keeper | `TODO` | | | registrar versão fixada |
+| P01-T01 — ClickHouse e Keeper | `IN PROGRESS` | 2026-09-13 | 261e6ba | arquivos gerados e versão registrada (26.8.3.105); **não validado** — sem Docker nesta sessão (Bloqueios #3). Usuário roda `make up` na própria máquina para confirmar os 4 critérios de aceite |
 | P01-T02 — Kafka e Schema Registry | `TODO` | | | |
 | P01-T03 — Kafka Connect com plugin | `TODO` | | | registrar versão do plugin |
 | P01-T04 — **GATE** de paridade | `TODO` | | | Refreshable MV + KeeperMap |

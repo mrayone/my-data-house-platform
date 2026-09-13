@@ -1,0 +1,13 @@
+<!--
+  Refreshable Materialized View (ADR-0005) é o pilar da camada de marts.
+
+  Na versão fixada nesta PoC (ver docker-compose.yml e
+  docs/evaluation/clickhouse-cloud-gcp-criteria.md) a feature já é estável e
+  NÃO exige nenhum allow_experimental_* — este arquivo é mantido, vazio de
+  settings experimentais, de propósito: é o registro de que a verificação foi
+  feita (P01-T04) e a decisão de não precisar do flag foi deliberada, não um
+  esquecimento. Se uma versão futura reintroduzir a feature como experimental,
+  o setting entra aqui e o motivo é registrado no doc de avaliação.
+-->
+<clickhouse>
+</clickhouse>

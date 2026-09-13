@@ -1,0 +1,15 @@
+<!--
+  Logging da PoC: nível reduzido e rotação curta para não estourar o volume do
+  Compose. Não é o que se usaria em produção — é o suficiente para diagnosticar
+  a PoC localmente sem gerar ruído no benchmark (Fase 08).
+-->
+<clickhouse>
+    <logger>
+        <level>information</level>
+        <console>1</console>
+        <log remove="remove"/>
+        <errorlog remove="remove"/>
+        <size>50M</size>
+        <count>3</count>
+    </logger>
+</clickhouse>

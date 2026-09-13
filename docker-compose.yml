@@ -1,0 +1,72 @@
+# Ambiente local da PoC (ADR-0008 — topologia single-node, paridade explícita
+# com ClickHouse Cloud no GCP). Suba com `make up`, nunca `docker compose up`
+# direto: o Makefile espera os healthchecks antes de devolver o prompt.
+#
+# Versões fixadas (ver docs/evaluation/clickhouse-cloud-gcp-criteria.md):
+#   ClickHouse       26.8.3.105 (LTS)
+#   Confluent Platform 8.5.0 (Kafka em KRaft — sem ZooKeeper)
+#   clickhouse-kafka-connect v1.5.0 (deploy/connect/Dockerfile)
+#
+# TODO(humano, ao rodar pela primeira vez com rede irrestrita): fixar também o
+# digest de cada imagem (`docker inspect --format='{{index .RepoDigests 0}}' <img>`)
+# e colar aqui, conforme ADR-0008 §6. Esta sessão de execução não teve acesso a
+# um registry de imagens Docker para calcular os digests de antemão.
+
+name: my-data-house-platform
+
+x-clickhouse-image: &clickhouse-image clickhouse/clickhouse-server:26.8.3.105
+
+services:
+  clickhouse:
+    image: *clickhouse-image
+    container_name: dh-clickhouse
+    hostname: clickhouse
+    ports:
+      - "8123:8123" # HTTP
+      - "9000:9000" # nativo (clickhouse-client)
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-default}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-changeme}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ./deploy/clickhouse/config:/etc/clickhouse-server/config.d:ro
+      - ./deploy/clickhouse/users:/etc/clickhouse-server/users.d:ro
+      - clickhouse-data:/var/lib/clickhouse
+    depends_on:
+      clickhouse-keeper:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  clickhouse-keeper:
+    image: *clickhouse-image
+    container_name: dh-clickhouse-keeper
+    hostname: clickhouse-keeper
+    entrypoint: ["clickhouse-keeper"]
+    command: ["--config-file=/etc/clickhouse-keeper/keeper_config.xml"]
+    ports:
+      - "9181:9181"
+    volumes:
+      - ./deploy/keeper/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - keeper-data:/var/lib/clickhouse-keeper
+    healthcheck:
+      # `ruok` é o comando de saúde do protocolo Zookeeper/Keeper — responde "imok".
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9181 && printf 'ruok' >&3 && head -c 4 <&3 | grep -q imok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+
+volumes:
+  clickhouse-data:
+  keeper-data:
