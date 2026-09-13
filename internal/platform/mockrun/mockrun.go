@@ -14,22 +14,22 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
-	customergen "github.com/mrayone/my-data-house-platform/internal/contexts/customer/generator"
-	inventorygen "github.com/mrayone/my-data-house-platform/internal/contexts/inventory/generator"
-	organizationgen "github.com/mrayone/my-data-house-platform/internal/contexts/organization/generator"
-	pricinggen "github.com/mrayone/my-data-house-platform/internal/contexts/pricing/generator"
-	salesgen "github.com/mrayone/my-data-house-platform/internal/contexts/sales/generator"
 	"github.com/mrayone/my-data-house-platform/internal/platform/mockgen"
 )
 
 // Dataset agrupa os registros gerados de uma entidade com o contexto/entidade
 // a que pertencem, para nomear o arquivo de saída e a tabela de destino.
+//
+// KeyFields são as colunas de chave de negócio do contrato
+// (contracts/domains/<ctx>/<entidade>.yaml) — viram a key da mensagem Kafka,
+// garantindo ordem por chave dentro da partição. No spike a lista vive aqui;
+// na Fase 02 ela passa a ser lida do contrato pelo dhctl.
 type Dataset struct {
-	Context string
-	Entity  string
-	Records []mockgen.Record
+	Context   string
+	Entity    string
+	KeyFields []string
+	Records   []mockgen.Record
 }
 
 // LandingTable retorna o nome totalmente qualificado da tabela de landing
@@ -41,26 +41,6 @@ func (d Dataset) LandingTable() string {
 // FileName retorna o nome do arquivo NDJSON de saída — <contexto>__<entidade>.jsonl.
 func (d Dataset) FileName() string {
 	return fmt.Sprintf("%s__%s.jsonl", d.Context, d.Entity)
-}
-
-// All gera o dataset completo da PoC para o instante base informado.
-//
-// A ordem retornada é deliberadamente "adversa" em alguns pontos (ex.:
-// sales/order_item antes de sales/order) para exercitar os cenários de
-// órfão transitório e late arrival documentados em sales/CLAUDE.md e no
-// cenário 009 — quem carrega estes datasets no ClickHouse decide a ordem de
-// INSERT, esta função só agrupa os dados.
-func All(base time.Time) []Dataset {
-	return []Dataset{
-		{Context: "organization", Entity: "business_unit", Records: organizationgen.BusinessUnits(base)},
-		{Context: "pricing", Entity: "discount_codes", Records: pricinggen.DiscountCodes(base)},
-		{Context: "pricing", Entity: "prices", Records: pricinggen.Prices(base)},
-		{Context: "customer", Entity: "customer", Records: customergen.Customers(base)},
-		{Context: "inventory", Entity: "stock_position", Records: inventorygen.StockPositions(base)},
-		{Context: "sales", Entity: "order_item", Records: salesgen.OrderItems(base)},
-		{Context: "sales", Entity: "order", Records: salesgen.Orders(base)},
-		{Context: "sales", Entity: "order_payment", Records: salesgen.OrderPayments(base)},
-	}
 }
 
 // WriteNDJSON grava cada dataset em <dir>/<Dataset.FileName()>, um registro
