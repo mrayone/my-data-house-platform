@@ -172,6 +172,8 @@ progresso; um workaround escondido é dívida.
 | # | Tarefa | Data | Descrição | Erro literal | Status |
 |---|---|---|---|---|---|
 | 1 | P00-T02 | 2026-09-13 | `golangci-lint` não instala: dependências transitivas usam vanity imports não resolvidos pela rede do ambiente de execução (`golang.org/x/*`, `honnef.co/go/tools`, `go-simpler.org/*`, `go.uber.org/*`). | `unrecognized import path "golang.org/x/tools": https fetch: Get "https://golang.org/x/tools?go-get=1": Forbidden` (e equivalentes para os demais domínios) | `ACEITO` — ver [`docs/TECH-DEBT.md`](../TECH-DEBT.md) TD-001 |
+| 2 | — (antes da Fase 01) | 2026-09-13 | Esta sessão de execução (ambiente sandboxed do Cowork) não tem chave SSH nem token configurado para `git push` em `origin` — só leitura HTTPS anônima funciona. Todos os commits da Fundação e da Fase 00 estão em `main` **local**, mas `origin/main` no GitHub ainda não os tem. | `git@github.com: Permission denied (publickey)` | `ABERTO` — precisa que alguém rode `git push origin main` (e as branches de fase) a partir de um ambiente com as credenciais do usuário |
+| 3 | Bloqueia Fase 01 | 2026-09-13 | Docker/Docker Compose não está disponível nesta sessão de execução (VM sandboxed sem Docker instalado e sem privilégio para instalar). A Fase 01 (ClickHouse, Keeper, Kafka, Schema Registry, Connect) e todas as fases seguintes dependem desse ambiente subir via `docker compose`. | `bash: docker: command not found` | `ABERTO` — precisa rodar a partir de um ambiente com Docker (a própria máquina do usuário, fora deste sandbox, ou um runner de CI com Docker) |
 
 Status: `ABERTO` · `EM ANÁLISE` · `RESOLVIDO` (com o commit que resolveu) ·
 `ACEITO` (virou dívida em `docs/TECH-DEBT.md`)
