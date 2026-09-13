@@ -20,7 +20,7 @@ iniciada.
 | Fase | Status | Branch | Concluída em | Observação |
 |---|---|---|---|---|
 | Fundação (docs + estrutura) | **DONE** | `docs/foundation` | 2026-09-13 | ADRs, arquitetura, 10 cenários, contratos, plano |
-| [00 — Bootstrap do repositório](phases/phase-00-repo-bootstrap.md) | `TODO` | | | |
+| [00 — Bootstrap do repositório](phases/phase-00-repo-bootstrap.md) | `DONE` | `feat/phase-00-repo-bootstrap` | 2026-09-13 | módulo Go, Makefile, checks de fronteira, CI; golangci-lint em TD-001; CI não executado de fato (sem acesso de push nesta sessão) |
 | [01 — Ambiente local + gate de paridade](phases/phase-01-local-environment.md) | `TODO` | | | **P01-T04 é gate: se falhar, pare** |
 | [02 — Contratos, codegen e migrations](phases/phase-02-contracts-and-dhctl.md) | `TODO` | | | fase mais densa |
 | [03 — Tópicos, schemas e producer](phases/phase-03-provisioning-and-producer.md) | `TODO` | | | |
@@ -57,7 +57,7 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 | P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | 78f0c15 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
 | P00-T02 — `Makefile` | `DONE` | 2026-09-13 | 3770e5d | `golangci-lint` indisponível na rede do ambiente — ver bloqueio #1 / TD-001; `lint` cai para `go vet` |
 | P00-T03 — checks de fronteira de contexto | `DONE` | 2026-09-13 | 4515275 | `go list -deps`; 2 sabotagens testadas (contexto→contexto e platform→contexts) e desfeitas |
-| P00-T04 — CI e `CLAUDE.md` por contexto | `TODO` | | | |
+| P00-T04 — CI e `CLAUDE.md` por contexto | `DONE` | 2026-09-13 | 3d03240 | CLAUDE.md de internal/cmd/db/deploy e dos 6 contextos já existiam da Fundação; CI não pôde ser confirmado verde nesta sessão (sem push para origin — ver observação da Fase 00) |
 
 ## Fase 01 — Ambiente local e gate de paridade
 
