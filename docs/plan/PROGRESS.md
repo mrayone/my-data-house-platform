@@ -71,8 +71,8 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 
 | Tarefa | Status | Data | Commit | Observação |
 |---|---|---|---|---|
-| P01-T01 — ClickHouse e Keeper | `IN PROGRESS` | 2026-09-13 | 261e6ba | arquivos gerados e versão registrada (26.8.3.105); **não validado** — sem Docker nesta sessão (Bloqueios #3). Usuário roda `make up` na própria máquina para confirmar os 4 critérios de aceite |
-| P01-T02 — Kafka e Schema Registry | `IN PROGRESS` | 2026-09-13 | edf2f37 | KRaft, auto-create desligado, compat backward; **não validado** — sem Docker nesta sessão |
+| P01-T01 — ClickHouse e Keeper | `IN PROGRESS` | 2026-09-13 | 8f0c61c | arquivos gerados e versão registrada (26.8.3.105); **não validado** — sem Docker nesta sessão (Bloqueios #3). Usuário roda `make up` na própria máquina para confirmar os 4 critérios de aceite |
+| P01-T02 — Kafka e Schema Registry | `IN PROGRESS` | 2026-09-13 | 67885ec | KRaft, auto-create desligado, compat backward; **não validado** — sem Docker nesta sessão |
 | P01-T03 — Kafka Connect com plugin | `IN PROGRESS` | 2026-09-13 | b56caa5 | clickhouse-kafka-connect v1.5.0 via release do GitHub; **não validado** — sem Docker nesta sessão |
 | P01-T04 — **GATE** de paridade | `TODO` | | | Refreshable MV + KeeperMap |
 | P01-T05 — runbook do ambiente local | `TODO` | | | |
