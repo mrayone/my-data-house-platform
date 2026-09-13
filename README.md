@@ -53,9 +53,16 @@ Detalhes: [`docs/architecture/overview.md`](docs/architecture/overview.md).
 
 ## Como rodar
 
-> **Status:** Fase 00 (bootstrap do repositório) concluída — módulo Go, `Makefile`
-> e checks estáticos existem. `up`/`bootstrap`/`seed`/`reports` chegam nas Fases
-> 01 a 04 — ver [`docs/plan/PROGRESS.md`](docs/plan/PROGRESS.md).
+> **Status:** Fase 00 (bootstrap) concluída. Fase 01 (ambiente local via Docker
+> Compose) tem o `docker-compose.yml` e os alvos `up`/`down`/`ps`/`logs` prontos,
+> mas ainda **não validada de ponta a ponta em máquina com Docker** nesta sessão
+> de execução (bloqueio registrado em
+> [`docs/plan/PROGRESS.md`](docs/plan/PROGRESS.md#bloqueios)). `bootstrap`
+> (tópicos/schemas/connectors via `dhctl`) e `seed`/`reports` orientados a
+> contrato chegam nas Fases 02-04. Enquanto isso, os alvos `db-apply` /
+> `mock-load` / `mock-verify` abaixo já sobem o schema completo e provam o
+> fluxo landing → core → marts com dados sintéticos — ver
+> [`docs/evaluation/spike-mock-flow-clickhouse-kafka.md`](docs/evaluation/spike-mock-flow-clickhouse-kafka.md).
 
 ```bash
 make tools       # instala as ferramentas de dev em ./bin (gofumpt; golangci-lint
@@ -64,18 +71,44 @@ make verify      # fmt-check + lint + test + checks de fronteira de contexto
 make build       # compila dhctl, producer e api em ./bin
 ```
 
-Comandos que ainda não existem (chegam nas próximas fases):
+### Ambiente local (Docker Compose)
 
 ```bash
 make up          # sobe ClickHouse, Keeper, Kafka, Schema Registry, Connect
-make bootstrap   # tópicos + schemas + migrations + connectors
-make seed        # produz carga CDC sintética nos tópicos
-make reports     # executa os relatórios dos cenários
+                 # (docker-compose.yml) e espera todos os healthchecks
+make ps          # lista os serviços e o status de saúde
+make logs SERVICE=kafka-connect   # segue os logs de um serviço (ou de todos, sem SERVICE)
+make down        # derruba o ambiente (mantém os volumes)
+make reset-env   # derruba e remove os volumes (estado zerado)
 ```
 
-`make help` lista todos os alvos disponíveis no momento. Requisitos e
-diagnóstico em
-[`docs/runbooks/local-environment.md`](docs/runbooks/local-environment.md).
+Requisitos e diagnóstico em
+[`docs/runbooks/local-environment.md`](docs/runbooks/local-environment.md)
+(runbook ainda placeholder — ver nota do bloqueio acima).
+
+### Schema + dados sintéticos (spike — enquanto `dhctl`/Kafka real não existem)
+
+Com o ambiente de cima no ar (`make up`), estes três alvos aplicam todo o DDL
+documentado nos ADRs e carregam um dataset determinístico que já exercita os
+casos adversos dos cenários (fora de ordem, delete, ressurreição, órfão,
+ASOF JOIN, retentativa de pagamento etc.):
+
+```bash
+make db-apply    # aplica bootstrap + landing + core + dictionaries + marts
+                 # (internal/contexts/*/sql, db/shared/00-bootstrap)
+make mock-load   # gera o dataset sintético (cmd/producer mock) e carrega
+                 # cada entidade em dh_landing.<contexto>__<entidade>_raw
+make mock-verify # roda a matriz de verificação do spike (14 checagens)
+```
+
+`producer mock` escreve NDJSON em `./out/mock/` e insere via
+`clickhouse-client ... FORMAT JSONEachRow` — um stand-in explícito para o
+producer Avro + Kafka Connect Sink reais da Fase 03, não o transporte final.
+Metodologia completa, o que foi e o que não foi provado, e os bugs de DDL
+encontrados no caminho:
+[`docs/evaluation/spike-mock-flow-clickhouse-kafka.md`](docs/evaluation/spike-mock-flow-clickhouse-kafka.md).
+
+`make help` lista todos os alvos disponíveis a qualquer momento.
 
 ---
 

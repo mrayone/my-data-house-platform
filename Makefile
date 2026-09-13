@@ -97,3 +97,18 @@ logs:
 .PHONY: reset-env
 reset-env:
 	docker compose down -v
+
+## db-apply: aplica bootstrap+landing+core+marts no ClickHouse do compose (spike; ver docs/evaluation/spike-mock-flow-clickhouse-kafka.md)
+.PHONY: db-apply
+db-apply:
+	@scripts/db/apply-ddl.sh
+
+## mock-load: gera dados sintéticos (producer mock) e carrega no ClickHouse do compose
+.PHONY: mock-load
+mock-load:
+	@scripts/mock/load.sh
+
+## mock-verify: roda a matriz de verificação do spike (dedup, delete, órfão, ASOF, dictionaries, funil, marts)
+.PHONY: mock-verify
+mock-verify:
+	@scripts/mock/verify.sh

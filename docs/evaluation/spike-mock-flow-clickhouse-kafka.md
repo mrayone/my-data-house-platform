@@ -90,6 +90,48 @@ funciona como especificado. Não é o entregável formal das Fases 02/03/05-08
    mart não a mostrava. Não é bug do ClickHouse nem do desenho: é um erro de
    dado do gerador. Corrigido movendo `ACQ-TEST` para 1 dia no passado.
 
+## Atualização — tooling via Docker Compose (não mais binário standalone)
+
+A primeira rodada deste spike (resultados acima) usou ClickHouse **standalone**
+(binário baixado dos releases do GitHub), porque a sessão de execução que a
+produziu não tinha Docker disponível. Depois de revisão, o pedido foi trocar
+isso pelo caminho real do projeto: o `docker-compose.yml` já existente
+(`feat/phase-01-local-environment`, mesclado nesta branch) e `clickhouse-client`
+rodando *dentro* do container via `docker compose exec` — nada de binário
+baixado à parte.
+
+Três scripts novos tornam isso repetível com os alvos de `make` já existentes:
+
+| Alvo | Script | O que faz |
+|---|---|---|
+| `make db-apply` | `scripts/db/apply-ddl.sh` | concatena bootstrap + landing + core + dictionaries + marts, substitui `{ON_CLUSTER}` e aplica via `docker compose exec clickhouse clickhouse-client --multiquery` |
+| `make mock-load` | `scripts/mock/load.sh` | compila `producer`, gera o dataset (`producer mock`) e insere cada arquivo NDJSON na tabela `dh_landing` correspondente via `docker compose exec ... FORMAT JSONEachRow` |
+| `make mock-verify` | `scripts/mock/verify.sh` | roda as 14 checagens desta matriz contra o ambiente do Compose |
+
+**Importante:** esta sessão de execução (ambiente sandboxed do Cowork) **não
+tem Docker** (`docker: command not found`, nem `podman`/`nerdctl`/socket
+disponível) — o mesmo bloqueio já registrado (`docs/plan/PROGRESS.md`,
+Bloqueio #3) para a Fase 01. Os três scripts foram escritos, revisados e têm
+a mesma lógica já validada standalone (mesmas queries, mesma ordem de
+aplicação de DDL, mesmo mapeamento arquivo→tabela), mas **não foram
+executados contra o Compose nesta sessão** — só o binário standalone (seção
+acima) foi executado de fato aqui. Rodar `make up && make db-apply && make
+mock-load && make mock-verify` numa máquina com Docker (a do usuário, fora
+deste sandbox) é o próximo passo para confirmar que o Compose se comporta
+identicamente ao standalone — o que é esperado, já que a única diferença é
+o transporte do comando (`docker compose exec` em vez de processo local),
+não a versão do ClickHouse (`26.8.3.105` nos dois casos) nem o SQL aplicado.
+
+Isto também significa que, ao rodar via Compose, a stack de Kafka real
+(Confluent 8.5.0 em KRaft) **fica disponível** — algo que o binário
+standalone não podia oferecer. `make mock-load` continua inserindo direto em
+`dh_landing` (sem passar pelo Kafka) porque o producer Avro + Kafka Connect
+Sink reais (Fase 03) ainda não existem; mas nada nesta stack Compose impede
+de, no futuro, produzir os mesmos dados em tópicos reais e deixar o
+Kafka Connect Sink fazer a ingestão — a lacuna registrada como "não provado"
+na seção anterior é sobre o que **esta sessão** validou, não sobre uma
+limitação do ambiente Docker em si.
+
 ## Reprodução
 
 ```bash
