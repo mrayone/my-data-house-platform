@@ -191,6 +191,22 @@ novo. Nunca edite o ADR aceito.
 
 ---
 
+## Spike — teste de fluxo mock (ClickHouse standalone)
+
+Fora da numeração de fases (não substitui nem antecipa a conclusão das Fases
+01-03): em 2026-09-13, na branch `spike/mock-flow-clickhouse-kafka`, foi
+construído um gerador de dados sintéticos completo para as 8 entidades
+(`internal/contexts/*/generator/`, `internal/platform/mockgen`,
+`internal/platform/mockrun`, `cmd/producer mock`) e validado o fluxo
+landing → core → marts contra um ClickHouse real (binário standalone, não
+Docker — ver Bloqueio #3). Resultado completo, incluindo o que foi e o que
+NÃO foi provado, em
+[`docs/evaluation/spike-mock-flow-clickhouse-kafka.md`](../evaluation/spike-mock-flow-clickhouse-kafka.md).
+Dois bugs de DDL foram encontrados e corrigidos durante o spike (dictionaries
+no database errado; view final ausente em `revenue_by_bu_day`) — detalhes no
+próprio documento. O transporte real Avro/Kafka/Connect (Fase 03) e o
+`dhctl generate` orientado a contrato (Fase 02) continuam TODO.
+
 ## Histórico da fundação
 
 | Data | Entrega |
