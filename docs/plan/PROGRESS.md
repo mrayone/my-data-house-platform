@@ -56,7 +56,7 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 |---|---|---|---|---|
 | P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | 78f0c15 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
 | P00-T02 — `Makefile` | `DONE` | 2026-09-13 | 3770e5d | `golangci-lint` indisponível na rede do ambiente — ver bloqueio #1 / TD-001; `lint` cai para `go vet` |
-| P00-T03 — checks de fronteira de contexto | `TODO` | | | |
+| P00-T03 — checks de fronteira de contexto | `DONE` | 2026-09-13 | 4515275 | `go list -deps`; 2 sabotagens testadas (contexto→contexto e platform→contexts) e desfeitas |
 | P00-T04 — CI e `CLAUDE.md` por contexto | `TODO` | | | |
 
 ## Fase 01 — Ambiente local e gate de paridade
