@@ -54,8 +54,8 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 
 | Tarefa | Status | Data | Commit | Observação |
 |---|---|---|---|---|
-| P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | de414a5 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
-| P00-T02 — `Makefile` | `TODO` | | | |
+| P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | 78f0c15 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
+| P00-T02 — `Makefile` | `DONE` | 2026-09-13 | 3770e5d | `golangci-lint` indisponível na rede do ambiente — ver bloqueio #1 / TD-001; `lint` cai para `go vet` |
 | P00-T03 — checks de fronteira de contexto | `TODO` | | | |
 | P00-T04 — CI e `CLAUDE.md` por contexto | `TODO` | | | |
 
@@ -163,7 +163,7 @@ progresso; um workaround escondido é dívida.
 
 | # | Tarefa | Data | Descrição | Erro literal | Status |
 |---|---|---|---|---|---|
-| — | — | — | nenhum registrado | — | — |
+| 1 | P00-T02 | 2026-09-13 | `golangci-lint` não instala: dependências transitivas usam vanity imports não resolvidos pela rede do ambiente de execução (`golang.org/x/*`, `honnef.co/go/tools`, `go-simpler.org/*`, `go.uber.org/*`). | `unrecognized import path "golang.org/x/tools": https fetch: Get "https://golang.org/x/tools?go-get=1": Forbidden` (e equivalentes para os demais domínios) | `ACEITO` — ver [`docs/TECH-DEBT.md`](../TECH-DEBT.md) TD-001 |
 
 Status: `ABERTO` · `EM ANÁLISE` · `RESOLVIDO` (com o commit que resolveu) ·
 `ACEITO` (virou dívida em `docs/TECH-DEBT.md`)
