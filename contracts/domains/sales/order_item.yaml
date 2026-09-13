@@ -1,0 +1,66 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: sales
+  entity: order_item
+  owner: time-ecommerce
+  description: Itens do pedido replicados do SAP via Datasphere. Entidade mutavel — quantidade e valor podem ser alterados antes do faturamento.
+  tags: [transacional, core]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.sales.order_item.v1
+  partitions: 12
+  key: [order_id, item_seq]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 10
+
+schema:
+  fields:
+    - { name: order_id,        type: string, nullable: false, doc: FK para sales/order. Pode chegar ANTES do pedido — orfandade transitoria e normal (ADR-0004 §7) }
+    - { name: item_seq,        type: int32,  nullable: false, doc: Sequencial do item dentro do pedido. Compoe a PK }
+    - { name: item_id,         type: string, nullable: false, doc: SKU. Conecta com pricing/prices e inventory/stock_position }
+    - { name: dc_id,           type: string, nullable: true,  doc: Centro de distribuicao de atendimento. Nulo enquanto o pedido nao e alocado }
+    - { name: quantity,        type: int32,  nullable: false }
+    - { name: unit_price,      type: decimal, precision: 18, scale: 4, nullable: false, doc: Preco praticado — comparado com prices.list_price por ASOF JOIN (cenario 005) }
+    - { name: gross_amount,    type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: discount_amount, type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: total_amount,    type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: created_at,      type: timestamp_micros, nullable: false }
+    - { name: updated_at,      type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [order_id, item_seq, _cdc_seq]
+  ttl_days: 180
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [order_id, item_seq]
+  partition_by: toYYYYMM(created_at)
+
+relations:
+  - to: sales/order
+    kind: foreign_key
+    join_on: { local: order_id, remote: order_id }
+    orphan_threshold_pct: 0.5
+    note: Relacao central do cenario 009 — mede taxa E idade do orfao
+  - to: pricing/prices
+    kind: temporal
+    join_on: { local: item_id, remote: item_id }
+    note: Resolvido por ASOF JOIN em created_at >= valid_from (cenario 005)
+  - to: inventory/stock_position
+    kind: lookup
+    join_on: { local: [item_id, dc_id], remote: [item_id, dc_id] }
+    orphan_threshold_pct: 2.0
+    note: Chave composta com dc_id nullable — cenarios 006 e 007
+
+extensions:
+  serving: true
+  analytics: true
+  pii: false

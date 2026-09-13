@@ -1,0 +1,56 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: sales
+  entity: order_payment
+  owner: time-pagamentos
+  description: Tentativas de pagamento do pedido replicadas do SAP via Datasphere. Um pedido tem N pagamentos (fan-out 1:N); o status de captura muda com o tempo.
+  tags: [transacional, core]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.sales.order_payment.v1
+  partitions: 6
+  key: [payment_id]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 10
+
+schema:
+  fields:
+    - { name: payment_id,     type: string, nullable: false, doc: PK da tentativa de pagamento }
+    - { name: order_id,       type: string, nullable: false, doc: FK para sales/order — relacao 1:N }
+    - { name: payment_method, type: string, nullable: false, low_cardinality: true, doc: credit_card|pix|boleto|voucher }
+    - { name: installments,   type: int32,  nullable: false, doc: Numero de parcelas. 1 para pagamento a vista }
+    - { name: payment_status, type: string, nullable: false, low_cardinality: true, doc: pending|authorized|captured|denied|refunded }
+    - { name: amount,         type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: acquirer,       type: string, nullable: false, low_cardinality: true, doc: Adquirente/PSP }
+    - { name: authorized_at,  type: timestamp_micros, nullable: true, doc: Nulo enquanto nao autorizado — base do tempo-ate-autorizacao (cenario 003) }
+    - { name: captured_at,    type: timestamp_micros, nullable: true }
+    - { name: created_at,     type: timestamp_micros, nullable: false }
+    - { name: updated_at,     type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [payment_id, _cdc_seq]
+  ttl_days: 180
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [payment_id]
+  partition_by: toYYYYMM(created_at)
+
+relations:
+  - to: sales/order
+    kind: foreign_key
+    join_on: { local: order_id, remote: order_id }
+    orphan_threshold_pct: 0.5
+
+extensions:
+  serving: true
+  analytics: true
+  pii: false

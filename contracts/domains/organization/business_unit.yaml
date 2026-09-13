@@ -1,0 +1,54 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: organization
+  entity: business_unit
+  owner: time-controladoria
+  description: Unidades de negocio replicadas do SAP via Datasphere. Cadastro pequeno (centenas de linhas) que quase nunca muda — exposto como Dictionary.
+  tags: [cadastro, dimensao]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.organization.business_unit.v1
+  partitions: 1
+  key: [bu_code]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 1440
+
+schema:
+  fields:
+    - { name: bu_code,     type: string, nullable: false, doc: PK — codigo da unidade. Alvo do join por coluna de sales/order.business_unit_code }
+    - { name: bu_name,     type: string, nullable: false }
+    - { name: channel,     type: string, nullable: false, low_cardinality: true, doc: ecommerce|fisica|marketplace }
+    - { name: region,      type: string, nullable: false, low_cardinality: true }
+    - { name: country,     type: string, nullable: false, low_cardinality: true }
+    - { name: cost_center, type: string, nullable: false }
+    - { name: active,      type: bool,   nullable: false }
+    - { name: created_at,  type: timestamp_micros, nullable: false }
+    - { name: updated_at,  type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [bu_code, _cdc_seq]
+  ttl_days: 365
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [bu_code]
+  expose_as_dictionary:
+    layout: COMPLEX_KEY_HASHED
+    lifetime_min_seconds: 300
+    lifetime_max_seconds: 600
+    attributes: [bu_name, channel, region, country, cost_center, active]
+
+relations: []
+
+extensions:
+  serving: true
+  analytics: true
+  pii: false

@@ -1,0 +1,53 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: customer
+  entity: customer
+  owner: time-crm
+  description: Cadastro de clientes replicado do SAP via Datasphere. Cadastro de porte medio, mutavel, com dado pessoal hasheado na origem.
+  tags: [cadastro, pii]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.customer.customer.v1
+  partitions: 6
+  key: [customer_id]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 60
+
+schema:
+  fields:
+    - { name: customer_id,    type: string, nullable: false, doc: PK do cliente no SAP }
+    - { name: document_hash,  type: string, nullable: false, doc: CPF/CNPJ hasheado na origem — nunca em claro }
+    - { name: first_name,     type: string, nullable: false }
+    - { name: email_hash,     type: string, nullable: false, doc: E-mail hasheado na origem }
+    - { name: customer_since, type: date,   nullable: false, doc: Base da analise de coorte (cenario 008) }
+    - { name: segment,        type: string, nullable: false, low_cardinality: true, doc: b2c|b2b|corporate }
+    - { name: loyalty_tier,   type: string, nullable: false, low_cardinality: true, doc: none|silver|gold|black }
+    - { name: city,           type: string, nullable: false }
+    - { name: state,          type: string, nullable: false, low_cardinality: true }
+    - { name: zipcode,        type: string, nullable: false, doc: Chave de correlacao geografica com outros topicos }
+    - { name: created_at,     type: timestamp_micros, nullable: false }
+    - { name: updated_at,     type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [customer_id, _cdc_seq]
+  ttl_days: 180
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [customer_id]
+  partition_by: toYYYYMM(customer_since)
+
+relations: []
+
+extensions:
+  serving: true
+  analytics: true
+  pii: true

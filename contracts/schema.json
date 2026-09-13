@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gruposbf.com.br/datahouse/contracts/v1/entity-contract.schema.json",
+  "title": "EntityContract",
+  "description": "Descritor de uma entidade replicada do SAP para o ClickHouse. Fonte da verdade da extensibilidade (ADR-0003). Unico artefato editado a mao por entidade.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "source",
+    "schema",
+    "landing",
+    "core"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "datahouse/v1"
+    },
+    "kind": {
+      "const": "EntityContract"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context",
+        "entity",
+        "owner",
+        "description"
+      ],
+      "properties": {
+        "context": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Bounded context. Define a pasta em contracts/domains, schemas/avro e internal/contexts."
+        },
+        "entity": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Nome da entidade em snake_case. Compoe os nomes de tabela: dh_landing.<context>__<entity>_raw, dh_core.<context>__<entity>."
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Time responsavel."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "topic",
+        "key",
+        "version_column",
+        "operation_column"
+      ],
+      "properties": {
+        "system": {
+          "enum": [
+            "sap",
+            "internal",
+            "synthetic"
+          ]
+        },
+        "cdc": {
+          "enum": [
+            "datasphere",
+            "debezium",
+            "none"
+          ],
+          "default": "datasphere"
+        },
+        "envelope": {
+          "enum": [
+            "flat",
+            "debezium"
+          ],
+          "default": "flat",
+          "description": "flat = after-image achatado com colunas de controle no proprio record. debezium = before/after/op, achatado pela SMT flatten do Connect (ADR-0006)."
+        },
+        "topic": {
+          "type": "string",
+          "pattern": "^sap\\.[a-z0-9_]+\\.[a-z0-9_]+\\.v[0-9]+$",
+          "description": "sap.<contexto>.<entidade>.v<n>. O v<n> e versao de CONTRATO, nao de schema."
+        },
+        "partitions": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6
+        },
+        "key": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Chave Kafka e chave de negocio. Vira o ORDER BY da tabela core."
+        },
+        "version_column": {
+          "type": "string",
+          "description": "Coluna monotonica por chave que define qual versao e a mais nova. AUTORIDADE de ordem (ADR-0004). Sem ela o contrato e invalido."
+        },
+        "operation_column": {
+          "type": "string",
+          "description": "Coluna com a operacao do CDC: c (create) | u (update) | d (delete) | r (snapshot/read)."
+        },
+        "soft_delete_operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "d"
+          ],
+          "description": "Valores de operation_column que marcam _is_deleted = 1."
+        },
+        "freshness_sla_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 60,
+          "description": "Idade maxima aceitavel da ultima mensagem. Alimenta dq.landing.freshness (ADR-0010). Topico de cadastro pode ter valor alto."
+        }
+      }
+    },
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fields"
+      ],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "default": "br.com.gruposbf.datahouse",
+          "description": "Namespace Avro. O contexto e concatenado automaticamente."
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "type": {
+                "enum": [
+                  "string",
+                  "bool",
+                  "int32",
+                  "int64",
+                  "float64",
+                  "decimal",
+                  "date",
+                  "timestamp_millis",
+                  "timestamp_micros",
+                  "bytes",
+                  "array",
+                  "map",
+                  "enum"
+                ],
+                "description": "Mapeamento normativo Avro<->ClickHouse em docs/architecture/extensibility.md. Tipo fora desta lista falha a validacao."
+              },
+              "nullable": {
+                "type": "boolean",
+                "default": false
+              },
+              "doc": {
+                "type": "string",
+                "description": "Obrigatorio em campo de chave ou de relacao (ADR-0006)."
+              },
+              "precision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 76,
+                "description": "Somente para decimal."
+              },
+              "scale": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Somente para decimal."
+              },
+              "items": {
+                "type": "string",
+                "description": "Tipo dos elementos, para array e map."
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Somente para enum."
+              },
+              "low_cardinality": {
+                "type": "boolean",
+                "default": false,
+                "description": "Gera LowCardinality(String) no ClickHouse. Use em coluna de dominio pequeno (status, canal, moeda)."
+              }
+            }
+          }
+        }
+      }
+    },
+    "landing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "partition_by",
+        "order_by",
+        "ttl_days"
+      ],
+      "properties": {
+        "partition_by": {
+          "type": "string",
+          "default": "toYYYYMM(_kafka_ts)"
+        },
+        "order_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "DEVE terminar em _cdc_seq: L0 preserva todas as versoes (ADR-0001)."
+        },
+        "ttl_days": {
+          "type": "integer",
+          "minimum": 90,
+          "description": "Deve ser >= retencao do Kafka. Minimo 90 dias, senao reprocesso fica impossivel."
+        }
+      }
+    },
+    "core": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "order_by"
+      ],
+      "properties": {
+        "engine": {
+          "enum": [
+            "ReplacingMergeTree"
+          ],
+          "description": "Unico engine permitido em L1 (ADR-0004)."
+        },
+        "order_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Chave de NEGOCIO. NAO inclua _cdc_seq: com ele cada versao vira linha distinta e nada deduplica."
+        },
+        "partition_by": {
+          "type": "string"
+        },
+        "expose_as_dictionary": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Cadastro pequeno consultado por chave: gera dh_core.dict__<entidade> (ADR-0005).",
+          "required": [
+            "layout",
+            "lifetime_min_seconds",
+            "lifetime_max_seconds"
+          ],
+          "properties": {
+            "layout": {
+              "enum": [
+                "HASHED",
+                "COMPLEX_KEY_HASHED",
+                "FLAT",
+                "COMPLEX_KEY_SPARSE_HASHED"
+              ]
+            },
+            "lifetime_min_seconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lifetime_max_seconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Colunas expostas. Default: todas menos as tecnicas."
+            }
+          }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "description": "Documentacao executavel: NAO gera JOIN. Alimenta o mapa de data-flow, a validacao de referencia e os checks dq.rel.* (ADR-0003).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "to",
+          "kind",
+          "join_on"
+        ],
+        "properties": {
+          "to": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+/[a-z0-9_]+$",
+            "description": "<contexto>/<entidade>. Deve existir um contrato com esse caminho."
+          },
+          "kind": {
+            "enum": [
+              "foreign_key",
+              "lookup",
+              "temporal",
+              "loose"
+            ],
+            "description": "foreign_key = deve existir. lookup = cadastro, pode faltar. temporal = resolvido por ASOF JOIN. loose = conecta por coluna comum sem hierarquia."
+          },
+          "orphan_threshold_pct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0.5,
+            "description": "Limite de dq.rel.orphan_rate para esta relacao."
+          },
+          "note": {
+            "type": "string"
+          },
+          "join_on": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "local",
+              "remote"
+            ],
+            "properties": {
+              "local": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "remote": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "description": "Colunas que ligam as duas entidades. Nome 'join_on' e nao 'on' de proposito: em YAML 1.1 a chave 'on' e interpretada como o booleano true."
+          }
+        }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "serving": {
+          "type": "boolean",
+          "default": false,
+          "description": "Exposto pela API aplicacional (cmd/api)."
+        },
+        "analytics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Participa de marts analiticos."
+        },
+        "pii": {
+          "type": "boolean",
+          "default": false,
+          "description": "Contem dado pessoal: exige coluna hasheada e fica fora de log."
+        }
+      }
+    }
+  }
+}

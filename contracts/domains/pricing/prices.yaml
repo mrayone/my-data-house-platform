@@ -1,0 +1,54 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: pricing
+  entity: prices
+  owner: time-pricing
+  description: Precos de tabela por item e lista, versionados por vigencia. A correlacao com a venda e TEMPORAL, nao por ID — resolvida por ASOF JOIN (cenario 005).
+  tags: [cadastro, temporal]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.pricing.prices.v1
+  partitions: 6
+  key: [item_id, price_list_id, valid_from]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 240
+
+schema:
+  fields:
+    - { name: item_id,       type: string, nullable: false, doc: SKU — unica coluna de ligacao com order_item e stock_position }
+    - { name: price_list_id, type: string, nullable: false, low_cardinality: true, doc: "Lista de preco (varejo, atacado, promocional). Compoe a PK" }
+    - { name: currency,      type: string, nullable: false, low_cardinality: true }
+    - { name: list_price,    type: decimal, precision: 18, scale: 4, nullable: false, doc: Preco de tabela — referencia para desconto efetivo }
+    - { name: cost_price,    type: decimal, precision: 18, scale: 4, nullable: false, doc: Custo — base do calculo de margem }
+    - { name: valid_from,    type: timestamp_micros, nullable: false, doc: Inicio de vigencia. Lado direito do ASOF JOIN. Compoe a PK }
+    - { name: valid_to,      type: timestamp_micros, nullable: true,  doc: Fim de vigencia. Nulo = vigente indefinidamente }
+    - { name: created_at,    type: timestamp_micros, nullable: false }
+    - { name: updated_at,    type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [item_id, price_list_id, valid_from, _cdc_seq]
+  ttl_days: 365
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [item_id, price_list_id, valid_from]
+  partition_by: toYYYYMM(valid_from)
+
+relations:
+  - to: inventory/stock_position
+    kind: loose
+    join_on: { local: item_id, remote: item_id }
+    note: Conectam-se APENAS por item_id, sem passar pela entidade transacional — base do cenario 010
+
+extensions:
+  serving: false
+  analytics: true
+  pii: false

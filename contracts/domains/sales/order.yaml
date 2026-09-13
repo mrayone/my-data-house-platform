@@ -1,0 +1,67 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: sales
+  entity: order
+  owner: time-ecommerce
+  description: Cabecalho do pedido de venda replicado do SAP via Datasphere. Entidade mutavel — o status muda ao longo do ciclo de vida.
+  tags: [transacional, core]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.sales.order.v1
+  partitions: 6
+  key: [order_id]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 10
+
+schema:
+  fields:
+    - { name: order_id,           type: string, nullable: false, doc: PK do pedido no SAP }
+    - { name: customer_id,        type: string, nullable: false, doc: FK para customer/customer }
+    - { name: business_unit_code,  type: string, nullable: false, low_cardinality: true, doc: "Codigo da unidade de negocio — join por coluna, nao por ID surrogate" }
+    - { name: order_status,       type: string, nullable: false, low_cardinality: true, doc: created|paid|invoiced|shipped|delivered|canceled }
+    - { name: channel,            type: string, nullable: false, low_cardinality: true, doc: web|app|store }
+    - { name: currency,           type: string, nullable: false, low_cardinality: true }
+    - { name: discount_code,      type: string, nullable: true,  doc: Cupom aplicado. Pode nao existir em pricing/discount_codes (achado de qualidade — cenario 004) }
+    - { name: gross_amount,       type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: discount_amount,    type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: freight_amount,     type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: total_amount,       type: decimal, precision: 18, scale: 4, nullable: false }
+    - { name: created_at,         type: timestamp_micros, nullable: false }
+    - { name: updated_at,         type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [order_id, _cdc_seq]
+  ttl_days: 180
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [order_id]
+  partition_by: toYYYYMM(created_at)
+
+relations:
+  - to: customer/customer
+    kind: foreign_key
+    join_on: { local: customer_id, remote: customer_id }
+    orphan_threshold_pct: 0.1
+  - to: organization/business_unit
+    kind: lookup
+    join_on: { local: business_unit_code, remote: bu_code }
+    note: Resolvido por dictGet em dh_core.dict__business_unit (ADR-0005)
+  - to: pricing/discount_codes
+    kind: lookup
+    join_on: { local: discount_code, remote: discount_code }
+    orphan_threshold_pct: 5.0
+    note: Cupom orfao e esperado e e o proprio achado do cenario 004 — threshold alto de proposito
+
+extensions:
+  serving: true
+  analytics: true
+  pii: false
