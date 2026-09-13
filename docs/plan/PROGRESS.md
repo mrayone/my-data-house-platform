@@ -35,6 +35,14 @@ Status possíveis: `TODO` · `IN PROGRESS` · `BLOCKED` · `DONE` · `OPCIONAL`
 
 ---
 
+## Nota sobre a coluna Commit
+
+O hash de uma tarefa é o commit que a introduziu; quando esse commit precisa
+"conhecer" o próprio hash (para preencher esta tabela), o valor é corrigido
+por um commit de ajuste logo em seguida — o hash da própria tarefa de ajuste
+fica, por definição, uma referência a mais adiante (não se autorreferencia).
+Use `git log --oneline` na branch da fase se precisar do estado exato.
+
 ## Como registrar progresso
 
 Ao concluir uma tarefa, edite a tabela da fase correspondente abaixo:
@@ -55,8 +63,8 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 | Tarefa | Status | Data | Commit | Observação |
 |---|---|---|---|---|
 | P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | 78f0c15 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
-| P00-T02 — `Makefile` | `DONE` | 2026-09-13 | 3770e5d | `golangci-lint` indisponível na rede do ambiente — ver bloqueio #1 / TD-001; `lint` cai para `go vet` |
-| P00-T03 — checks de fronteira de contexto | `DONE` | 2026-09-13 | 4515275 | `go list -deps`; 2 sabotagens testadas (contexto→contexto e platform→contexts) e desfeitas |
+| P00-T02 — `Makefile` | `DONE` | 2026-09-13 | a48a403 | `golangci-lint` indisponível na rede do ambiente — ver bloqueio #1 / TD-001; `lint` cai para `go vet` |
+| P00-T03 — checks de fronteira de contexto | `DONE` | 2026-09-13 | 4492e50 | `go list -deps`; 2 sabotagens testadas (contexto→contexto e platform→contexts) e desfeitas |
 | P00-T04 — CI e `CLAUDE.md` por contexto | `DONE` | 2026-09-13 | 3d03240 | CLAUDE.md de internal/cmd/db/deploy e dos 6 contextos já existiam da Fundação; CI não pôde ser confirmado verde nesta sessão (sem push para origin — ver observação da Fase 00) |
 
 ## Fase 01 — Ambiente local e gate de paridade
