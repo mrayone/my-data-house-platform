@@ -104,11 +104,35 @@ make mock-verify # roda a matriz de verificação do spike (14 checagens)
 ```
 
 `producer mock` escreve NDJSON em `./out/mock/` e insere via
-`clickhouse-client ... FORMAT JSONEachRow` — um stand-in explícito para o
-producer Avro + Kafka Connect Sink reais da Fase 03, não o transporte final.
-Metodologia completa, o que foi e o que não foi provado, e os bugs de DDL
-encontrados no caminho:
+`clickhouse-client ... FORMAT JSONEachRow` — atalho que bypassa o Kafka.
+Metodologia completa:
 [`docs/evaluation/spike-mock-flow-clickhouse-kafka.md`](docs/evaluation/spike-mock-flow-clickhouse-kafka.md).
+
+### Fluxo completo via Kafka (producer Avro → Connect → ClickHouse)
+
+O mesmo dataset também flui pelo **transporte real**: o `producer kafka`
+serializa cada registro em Avro (wire format Confluent, schema registrado no
+Schema Registry) e publica nos tópicos `sap.*`; os **ClickHouse Kafka Connect
+Sinks** (um por tópico, `deploy/connect/connectors/`) consomem para
+`dh_landing.*`, e as MVs incrementais + Refreshable fazem a agregação
+landing → core → marts:
+
+```bash
+make kafka-e2e        # tudo de uma vez: DDL + tópicos + connectors + carga Avro + verificação
+```
+
+Ou passo a passo:
+
+```bash
+make kafka-topics     # cria os tópicos sap.* + DLQs (partições dos contratos)
+make connectors-apply # aplica os 8 sink connectors no Kafka Connect (REST 8083)
+make kafka-load       # publica os 69 registros mock em Avro nos tópicos
+make mock-verify      # matriz de 14 verificações sobre o que chegou via Kafka
+```
+
+Tópicos, schemas e connectors ficam visíveis no **Kafka UI**
+(http://localhost:8080); mensagem malformada vai para a DLQ `dh-dlq-<tópico>`,
+nunca é descartada em silêncio.
 
 `make help` lista todos os alvos disponíveis a qualquer momento.
 

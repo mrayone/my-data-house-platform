@@ -112,3 +112,27 @@ mock-load:
 .PHONY: mock-verify
 mock-verify:
 	@scripts/mock/verify.sh
+
+## kafka-topics: cria os tópicos das entidades contratadas + DLQs (partições dos contratos)
+.PHONY: kafka-topics
+kafka-topics:
+	@scripts/kafka/create-topics.sh
+
+## connectors-apply: aplica os ClickHouse Sink connectors (deploy/connect/connectors) no Kafka Connect
+.PHONY: connectors-apply
+connectors-apply:
+	@scripts/kafka/apply-connectors.sh
+
+## kafka-load: publica o dataset mock em Avro nos tópicos Kafka (transporte real: producer -> Kafka -> Connect -> ClickHouse)
+.PHONY: kafka-load
+kafka-load:
+	@mkdir -p bin
+	@go build -o bin/producer ./cmd/producer
+	@./bin/producer kafka
+
+## kafka-e2e: fluxo completo — DDL + tópicos + connectors + carga Avro + matriz de verificação
+.PHONY: kafka-e2e
+kafka-e2e: db-apply kafka-topics connectors-apply kafka-load
+	@echo ">> aguardando os sinks drenarem os tópicos..."
+	@sleep 15
+	@scripts/mock/verify.sh
