@@ -121,7 +121,7 @@ a existir:
 | 01 | `up` `down` `logs` `ps` `reset-env` `parity-check` |
 | 02 | `build` `generate` `generate-check` `migrate` `migrate-status` `reset` |
 | 03 | `topics` `schemas` `seed` `seed-adverse` |
-| 04 | `connectors` `connectors-status` `bootstrap` `ingestion-reset-state` |
+| 04 | `connectors` `connectors-status` `bootstrap` `ingestion-reset-state` `test-e2e` |
 | 05 | `core-rebuild` |
 | 06 | `mart-refresh` `reports` |
 | 07 | `api` `api-smoke` `ext-drill` |

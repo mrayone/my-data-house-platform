@@ -57,6 +57,7 @@ execução** ([ADR-0005](../../../docs/adr/0005-estrategia-de-agregacao-mv-refre
 | ID | O que exercita |
 |---|---|
 | `BU-TEST` | BU isolada para asserções de receita (cenário 002) |
+| `BU-01` / `BU-02` | escopo de cupom: cadastrado em `BU-01`, usado em `BU-02` (cenário 004) |
 
 ## Regras
 

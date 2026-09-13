@@ -63,7 +63,9 @@ precisar mudar, atualize os docs de cenário no mesmo commit.
 | `ORD-DEL-1` | delete de CDC |
 | `ORD-RES-1` | ressurreição após delete |
 | `ORD-ORPHAN` | item sem pedido (órfão) |
-| `ORD-LATE-1` | late arrival para o e2e de autocorreção |
+| `ORD-LATE-1` | late arrival: itens antes do pedido |
+| `ORD-LATE-2` | late arrival inverso: pedido antes dos itens |
+| `ORD-000123` | pedido de exemplo dos critérios do cenário 001 (ID gerado em massa) |
 | `BU-TEST` | BU isolada para asserções de receita |
 | `ACQ-TEST` | dedup de tentativa de pagamento |
 | `ACQ-LAT-TEST` | latência de autorização com nulo |

@@ -14,6 +14,7 @@ O motor de extensibilidade. Subcomandos:
 
 | Subcomando | O que faz | Fase |
 |---|---|---|
+| `version` | imprime nome e versão do binário | 00 |
 | `contract validate [paths]` | valida descritores | 02 |
 | `contract list` | lista as entidades | 02 |
 | `contract import --from-subject` | rascunho de contrato a partir do Schema Registry | 02 |

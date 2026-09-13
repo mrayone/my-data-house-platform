@@ -173,7 +173,14 @@ código por entidade**.
   `SKU-PREJUIZO`, `SKU-FX`, `SKU-PARADO`, `SKU-SEM-PRECO-COM-ESTOQUE`,
   `SKU-PRECO-SEM-POSICAO`, `SKU-VENDA-CANCELADA`, `SKU-VENDA-ANTIGA`,
   `CUPOM-FANTASMA`, `CUPOM-EXPIRADO`, `CUPOM-LIMITE`, `PROMO10`/`promo10`/`" PROMO10 "`,
-  `ACQ-TEST`, `ACQ-LAT-TEST`, `ACQ-RETRY-TEST`, `BU-TEST`.
+  `ACQ-TEST`, `ACQ-LAT-TEST`, `ACQ-RETRY-TEST`, `BU-TEST`,
+  `ORD-LATE-1` (itens antes do pedido), `ORD-LATE-2` (pedido antes dos itens),
+  `BU-01` e `BU-02` (escopo de cupom: cadastrado em `BU-01`, usado em `BU-02`).
+- **Formato dos IDs gerados em massa** (não nomeados), normativo porque critérios
+  de aceite os referenciam: `ORD-%06d`, `CUST-%06d`, `PAY-%06d`, `SKU-%06d`,
+  `DC-%02d`, `BU-%02d`, começando em 1. Com `--seed` fixo, `ORD-000123` e
+  `CUST-000001` existem sempre — é o que torna os critérios dos cenários 001 e
+  008 executáveis sem depender de sorte.
 - Estes IDs são o **contrato entre o gerador e os testes das fases 05-08**. Mudá-los
   quebra critérios de aceite adiante; se precisar mudar, atualize os docs de
   cenário no mesmo commit.

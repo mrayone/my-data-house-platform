@@ -59,6 +59,7 @@ dimensão de lookup. Nos marts, entra por `LEFT JOIN` dentro de Refreshable MV.
 | `CUST-CANCEL-ANTIGO` | cancelamento retroativo (prova a ausência de janela) |
 | `CUST-5-STATUS` | dedup de pedido com 5 transições |
 | `CUST-1-PEDIDO` | comprador de uma única vez (`avg_days_between_orders` nulo) |
+| `CUST-000001` | cliente de exemplo do critério de latência do cenário 008 (ID gerado em massa) |
 
 ## Regras
 
