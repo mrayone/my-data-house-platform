@@ -1,0 +1,58 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: pricing
+  entity: discount_codes
+  owner: time-marketing
+  description: Cadastro de cupons e campanhas replicado do SAP via Datasphere. Cadastro pequeno, exposto como Dictionary. A ligacao com o pedido e por CODIGO (string), e cupom usado pode nao existir no cadastro.
+  tags: [cadastro, dimensao]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.pricing.discount_codes.v1
+  partitions: 1
+  key: [discount_code]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 720
+
+schema:
+  fields:
+    - { name: discount_code,      type: string, nullable: false, doc: PK — o proprio codigo do cupom. Alvo do join de sales/order.discount_code }
+    - { name: campaign_name,      type: string, nullable: false }
+    - { name: discount_type,      type: string, nullable: false, low_cardinality: true, doc: percent|fixed|freight }
+    - { name: discount_value,     type: decimal, precision: 18, scale: 4, nullable: false, doc: Percentual (0-100) se percent; valor absoluto se fixed }
+    - { name: valid_from,         type: timestamp_micros, nullable: false }
+    - { name: valid_to,           type: timestamp_micros, nullable: false }
+    - { name: max_uses,           type: int64,  nullable: false, doc: Limite de usos — comparado com o uso real no cenario 004 }
+    - { name: business_unit_scope, type: string, nullable: true, doc: Restringe o cupom a uma BU. Nulo = valido para todas }
+    - { name: created_at,         type: timestamp_micros, nullable: false }
+    - { name: updated_at,         type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [discount_code, _cdc_seq]
+  ttl_days: 365
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [discount_code]
+  expose_as_dictionary:
+    layout: COMPLEX_KEY_HASHED
+    lifetime_min_seconds: 300
+    lifetime_max_seconds: 600
+    attributes: [campaign_name, discount_type, discount_value, valid_from, valid_to, max_uses, business_unit_scope]
+
+relations:
+  - to: organization/business_unit
+    kind: lookup
+    join_on: { local: business_unit_scope, remote: bu_code }
+
+extensions:
+  serving: false
+  analytics: true
+  pii: false

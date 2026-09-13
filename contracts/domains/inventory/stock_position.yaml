@@ -1,0 +1,55 @@
+apiVersion: datahouse/v1
+kind: EntityContract
+
+metadata:
+  context: inventory
+  entity: stock_position
+  owner: time-logistica
+  description: Posicao de estoque por item e centro de distribuicao, replicada do SAP via Datasphere. Entidade de ALTA taxa de atualizacao — a mesma chave recebe muitas versoes por dia.
+  tags: [operacional, alta-taxa]
+
+source:
+  system: sap
+  cdc: datasphere
+  envelope: flat
+  topic: sap.inventory.stock_position.v1
+  partitions: 12
+  key: [item_id, dc_id]
+  version_column: cdc_seq
+  operation_column: op
+  soft_delete_operations: [d]
+  freshness_sla_minutes: 30
+
+schema:
+  fields:
+    - { name: item_id,      type: string, nullable: false, doc: SKU. Compoe a PK e liga com order_item e prices }
+    - { name: dc_id,        type: string, nullable: false, low_cardinality: true, doc: Centro de distribuicao. Compoe a PK — chave COMPOSTA com item_id }
+    - { name: dc_name,      type: string, nullable: false }
+    - { name: on_hand,      type: int64,  nullable: false, doc: Quantidade fisica }
+    - { name: reserved,     type: int64,  nullable: false, doc: Quantidade reservada }
+    - { name: available,    type: int64,  nullable: false, doc: "on_hand - reserved, calculado na origem. Pode ser negativo em inconsistencia do SAP" }
+    - { name: safety_stock, type: int64,  nullable: false, doc: Estoque de seguranca — limite do alerta do cenario 006 }
+    - { name: position_at,  type: timestamp_micros, nullable: false, doc: Momento da apuracao da posicao na origem }
+    - { name: created_at,   type: timestamp_micros, nullable: false }
+    - { name: updated_at,   type: timestamp_micros, nullable: false }
+
+landing:
+  partition_by: toYYYYMM(_kafka_ts)
+  order_by: [item_id, dc_id, _cdc_seq]
+  ttl_days: 90
+
+core:
+  engine: ReplacingMergeTree
+  order_by: [item_id, dc_id]
+  partition_by: toYYYYMM(position_at)
+
+relations:
+  - to: pricing/prices
+    kind: loose
+    join_on: { local: item_id, remote: item_id }
+    note: Conectam-se APENAS por item_id — base do cenario 010 (capital imobilizado sem venda)
+
+extensions:
+  serving: true
+  analytics: true
+  pii: false
