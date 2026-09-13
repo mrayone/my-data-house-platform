@@ -1,0 +1,10 @@
+<!--
+  Requisito do exactly-once do ClickHouse Kafka Connect Sink (ADR-0002): o
+  connector guarda o estado de offsets processados numa tabela
+  ENGINE = KeeperMap, e toda KeeperMap precisa de um prefixo de caminho no
+  Keeper configurado aqui. Sem isto, `CREATE TABLE ... ENGINE = KeeperMap(...)`
+  falha.
+-->
+<clickhouse>
+    <keeper_map_path_prefix>/keeper_map_tables</keeper_map_path_prefix>
+</clickhouse>

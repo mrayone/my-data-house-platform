@@ -23,15 +23,22 @@ da contratação, e a Fase 09 o testa.
 
 ## 2. Versões fixadas
 
-*A preencher na Fase 01 (P01-T01, P01-T03).*
+> Preenchido nesta sessão a partir das releases mais recentes disponíveis em
+> `github.com` (o único registro acessível pela rede desta sessão de execução —
+> Docker Hub não pôde ser consultado, e o ambiente não tem Docker para calcular
+> os digests). **O digest de cada imagem fica pendente**: rode
+> `docker inspect --format='{{index .RepoDigests 0}}' <imagem>` após o primeiro
+> `docker compose pull` numa máquina com Docker e cole o resultado aqui
+> (ADR-0008 §6).
 
 | Componente | Versão | Digest / tag | Onde está fixado |
 |---|---|---|---|
-| ClickHouse Server | | | `docker-compose.yml` |
-| ClickHouse Keeper | | | `docker-compose.yml` |
-| `clickhouse-kafka-connect` | | | `deploy/connect/Dockerfile` |
-| Kafka (Confluent) | | | `docker-compose.yml` |
-| Schema Registry | | | `docker-compose.yml` |
+| ClickHouse Server | 26.8.3.105 (LTS) | tag fixada; digest **pendente** | `docker-compose.yml` |
+| ClickHouse Keeper | 26.8.3.105 (mesma imagem do server) | tag fixada; digest **pendente** | `docker-compose.yml` |
+| `clickhouse-kafka-connect` | v1.5.0 | release GitHub (zip); SHA-256 opcional via build-arg `CLICKHOUSE_CONNECT_SHA256` | `deploy/connect/Dockerfile` |
+| Kafka (Confluent Platform) | 8.5.0 (KRaft — sem ZooKeeper) | tag fixada; digest **pendente** | `docker-compose.yml` |
+| Schema Registry (Confluent Platform) | 8.5.0 | tag fixada; digest **pendente** | `docker-compose.yml` |
+| Kafka Connect base (Confluent Platform) | 8.5.0 | tag fixada; digest **pendente** | `deploy/connect/Dockerfile` |
 
 ---
 

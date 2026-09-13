@@ -6,6 +6,7 @@ silêncio. Todo check novo entra nesta tabela.
 | Script | O que impede | ADR de origem | Introduzido em |
 |---|---|---|---|
 | `context-boundaries.sh` | contexto importando outro contexto; `platform` importando `contexts` | [ADR-0009](../../docs/adr/0009-layout-de-pastas-context-first.md) | Fase 00 |
+| `wait-healthy.sh` | `make up` retornar verde com serviço ainda subindo | [deploy/CLAUDE.md](../../deploy/CLAUDE.md) #8 | Fase 01 |
 
 ## Convenção
 

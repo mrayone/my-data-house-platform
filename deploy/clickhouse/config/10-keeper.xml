@@ -1,0 +1,14 @@
+<!--
+  Aponta o ClickHouse server para o Keeper que roda no serviço
+  `clickhouse-keeper` do docker-compose.yml. Sem isto, KeeperMap (ADR-0002) e
+  Refreshable Materialized View (ADR-0005) — os dois pilares verificados no
+  gate P01-T04 — não têm onde guardar estado coordenado.
+-->
+<clickhouse>
+    <zookeeper>
+        <node>
+            <host>clickhouse-keeper</host>
+            <port>9181</port>
+        </node>
+    </zookeeper>
+</clickhouse>

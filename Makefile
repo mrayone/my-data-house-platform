@@ -70,3 +70,30 @@ build:
 .PHONY: verify
 verify: fmt-check lint test
 	@scripts/checks/context-boundaries.sh
+
+## up: sobe o ambiente local (ClickHouse, Keeper, Kafka, Schema Registry, Connect) e espera ficar healthy
+.PHONY: up
+up:
+	docker compose up -d --build
+	@echo ">> aguardando serviços ficarem healthy..."
+	@scripts/checks/wait-healthy.sh
+
+## down: derruba o ambiente local (mantém os volumes)
+.PHONY: down
+down:
+	docker compose down
+
+## ps: lista os serviços do ambiente local e o status de saúde
+.PHONY: ps
+ps:
+	docker compose ps
+
+## logs: segue os logs de um serviço (SERVICE=kafka-connect, por exemplo) ou de todos
+.PHONY: logs
+logs:
+	docker compose logs -f --tail=200 $(SERVICE)
+
+## reset-env: derruba o ambiente local e remove os volumes (estado zerado)
+.PHONY: reset-env
+reset-env:
+	docker compose down -v
