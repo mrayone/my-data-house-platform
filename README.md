@@ -53,8 +53,18 @@ Detalhes: [`docs/architecture/overview.md`](docs/architecture/overview.md).
 
 ## Como rodar
 
-> **Status:** a implementação ainda não começou. Estes comandos passam a existir nas
-> Fases 00 a 04 — ver [`docs/plan/PROGRESS.md`](docs/plan/PROGRESS.md).
+> **Status:** Fase 00 (bootstrap do repositório) concluída — módulo Go, `Makefile`
+> e checks estáticos existem. `up`/`bootstrap`/`seed`/`reports` chegam nas Fases
+> 01 a 04 — ver [`docs/plan/PROGRESS.md`](docs/plan/PROGRESS.md).
+
+```bash
+make tools       # instala as ferramentas de dev em ./bin (gofumpt; golangci-lint
+                 # quando a rede do ambiente resolver — ver docs/TECH-DEBT.md)
+make verify      # fmt-check + lint + test + checks de fronteira de contexto
+make build       # compila dhctl, producer e api em ./bin
+```
+
+Comandos que ainda não existem (chegam nas próximas fases):
 
 ```bash
 make up          # sobe ClickHouse, Keeper, Kafka, Schema Registry, Connect
@@ -63,7 +73,8 @@ make seed        # produz carga CDC sintética nos tópicos
 make reports     # executa os relatórios dos cenários
 ```
 
-`make help` lista todos os alvos. Requisitos e diagnóstico em
+`make help` lista todos os alvos disponíveis no momento. Requisitos e
+diagnóstico em
 [`docs/runbooks/local-environment.md`](docs/runbooks/local-environment.md).
 
 ---

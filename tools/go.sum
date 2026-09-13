@@ -1,0 +1,10 @@
+github.com/golang/mod v0.39.0 h1:URzPPdOVxOnqBmpAS/k5bGYVFtGM6zya0Jci7tKs+cw=
+github.com/golang/mod v0.39.0/go.mod h1:bvIbwjQ0HUFFf5AKukeeYQG4ZBUG9yxQbR9aEweIwYY=
+github.com/golang/sync v0.23.0 h1:+MkiyR+jHFcwZmVk+CsJLARSDWg+Kh6snabT+VF1ofA=
+github.com/golang/sync v0.23.0/go.mod h1:sUUOizhqBxiL6pEWpqNLUiaJn1ShEbZ6BBqskPbjZm0=
+github.com/golang/tools v0.39.0 h1:Cv+5sPRwiknrIMKltFWPpeR2G0SdUOBSG2e909H+1pM=
+github.com/golang/tools v0.39.0/go.mod h1:JnefbkDPyD8UU2kI5fuf8ZX4/yUeh9W877ZeBONxUqQ=
+github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
+github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/mvdan/gofumpt v0.7.0 h1:10ORbKcO6NpmSx4H84UxTQ9ZQYasNWAJhc5d6/I3sEI=
+github.com/mvdan/gofumpt v0.7.0/go.mod h1:txVFJy/Sc/mvaycET54pV8SW8gWxTlUuGHVEcncmNUo=

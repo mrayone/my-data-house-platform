@@ -20,7 +20,7 @@ iniciada.
 | Fase | Status | Branch | Concluída em | Observação |
 |---|---|---|---|---|
 | Fundação (docs + estrutura) | **DONE** | `docs/foundation` | 2026-09-13 | ADRs, arquitetura, 10 cenários, contratos, plano |
-| [00 — Bootstrap do repositório](phases/phase-00-repo-bootstrap.md) | `TODO` | | | |
+| [00 — Bootstrap do repositório](phases/phase-00-repo-bootstrap.md) | `DONE` | `feat/phase-00-repo-bootstrap` | 2026-09-13 | módulo Go, Makefile, checks de fronteira, CI; golangci-lint em TD-001; CI não executado de fato (sem acesso de push nesta sessão) |
 | [01 — Ambiente local + gate de paridade](phases/phase-01-local-environment.md) | `TODO` | | | **P01-T04 é gate: se falhar, pare** |
 | [02 — Contratos, codegen e migrations](phases/phase-02-contracts-and-dhctl.md) | `TODO` | | | fase mais densa |
 | [03 — Tópicos, schemas e producer](phases/phase-03-provisioning-and-producer.md) | `TODO` | | | |
@@ -34,6 +34,14 @@ iniciada.
 Status possíveis: `TODO` · `IN PROGRESS` · `BLOCKED` · `DONE` · `OPCIONAL`
 
 ---
+
+## Nota sobre a coluna Commit
+
+O hash de uma tarefa é o commit que a introduziu; quando esse commit precisa
+"conhecer" o próprio hash (para preencher esta tabela), o valor é corrigido
+por um commit de ajuste logo em seguida — o hash da própria tarefa de ajuste
+fica, por definição, uma referência a mais adiante (não se autorreferencia).
+Use `git log --oneline` na branch da fase se precisar do estado exato.
 
 ## Como registrar progresso
 
@@ -54,10 +62,10 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 
 | Tarefa | Status | Data | Commit | Observação |
 |---|---|---|---|---|
-| P00-T01 — módulo Go e árvore de pacotes | `TODO` | | | |
-| P00-T02 — `Makefile` | `TODO` | | | |
-| P00-T03 — checks de fronteira de contexto | `TODO` | | | |
-| P00-T04 — CI e `CLAUDE.md` por contexto | `TODO` | | | |
+| P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | 78f0c15 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
+| P00-T02 — `Makefile` | `DONE` | 2026-09-13 | a48a403 | `golangci-lint` indisponível na rede do ambiente — ver bloqueio #1 / TD-001; `lint` cai para `go vet` |
+| P00-T03 — checks de fronteira de contexto | `DONE` | 2026-09-13 | 4492e50 | `go list -deps`; 2 sabotagens testadas (contexto→contexto e platform→contexts) e desfeitas |
+| P00-T04 — CI e `CLAUDE.md` por contexto | `DONE` | 2026-09-13 | 3d03240 | CLAUDE.md de internal/cmd/db/deploy e dos 6 contextos já existiam da Fundação; CI não pôde ser confirmado verde nesta sessão (sem push para origin — ver observação da Fase 00) |
 
 ## Fase 01 — Ambiente local e gate de paridade
 
@@ -163,7 +171,7 @@ progresso; um workaround escondido é dívida.
 
 | # | Tarefa | Data | Descrição | Erro literal | Status |
 |---|---|---|---|---|---|
-| — | — | — | nenhum registrado | — | — |
+| 1 | P00-T02 | 2026-09-13 | `golangci-lint` não instala: dependências transitivas usam vanity imports não resolvidos pela rede do ambiente de execução (`golang.org/x/*`, `honnef.co/go/tools`, `go-simpler.org/*`, `go.uber.org/*`). | `unrecognized import path "golang.org/x/tools": https fetch: Get "https://golang.org/x/tools?go-get=1": Forbidden` (e equivalentes para os demais domínios) | `ACEITO` — ver [`docs/TECH-DEBT.md`](../TECH-DEBT.md) TD-001 |
 
 Status: `ABERTO` · `EM ANÁLISE` · `RESOLVIDO` (com o commit que resolveu) ·
 `ACEITO` (virou dívida em `docs/TECH-DEBT.md`)
