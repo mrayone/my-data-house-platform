@@ -53,15 +53,11 @@ Detalhes: [`docs/architecture/overview.md`](docs/architecture/overview.md).
 
 ## Como rodar
 
-> **Status:** Fase 00 (bootstrap) concluída. Fase 01 (ambiente local via Docker
-> Compose) tem o `docker-compose.yml` e os alvos `up`/`down`/`ps`/`logs` prontos,
-> mas ainda **não validada de ponta a ponta em máquina com Docker** nesta sessão
-> de execução (bloqueio registrado em
-> [`docs/plan/PROGRESS.md`](docs/plan/PROGRESS.md#bloqueios)). `bootstrap`
-> (tópicos/schemas/connectors via `dhctl`) e `seed`/`reports` orientados a
-> contrato chegam nas Fases 02-04. Enquanto isso, os alvos `db-apply` /
-> `mock-load` / `mock-verify` abaixo já sobem o schema completo e provam o
-> fluxo landing → core → marts com dados sintéticos — ver
+> **Status:** Fase 00 (bootstrap) e Fase 01 (ambiente local) concluídas e
+> validadas de ponta a ponta. Os alvos `db-apply` / `mock-load` / `mock-verify`
+> sobem o schema completo e provam o fluxo landing → core → marts com dados
+> sintéticos (14 verificações). `bootstrap` orientado a contrato (tópicos,
+> schemas, connectors via `dhctl`) chega nas Fases 02-04 — ver
 > [`docs/evaluation/spike-mock-flow-clickhouse-kafka.md`](docs/evaluation/spike-mock-flow-clickhouse-kafka.md).
 
 ```bash
@@ -74,7 +70,7 @@ make build       # compila dhctl, producer e api em ./bin
 ### Ambiente local (Docker Compose)
 
 ```bash
-make up          # sobe ClickHouse, Keeper, Kafka, Schema Registry, Connect
+make up          # sobe ClickHouse, Keeper, Kafka, Schema Registry, Connect e Kafka UI
                  # (docker-compose.yml) e espera todos os healthchecks
 make ps          # lista os serviços e o status de saúde
 make logs SERVICE=kafka-connect   # segue os logs de um serviço (ou de todos, sem SERVICE)
@@ -82,9 +78,15 @@ make down        # derruba o ambiente (mantém os volumes)
 make reset-env   # derruba e remove os volumes (estado zerado)
 ```
 
+#### Interfaces web disponíveis após `make up`
+
+| UI | URL | Credenciais |
+|---|---|---|
+| **ClickHouse Play** (SQL playground) | http://localhost:8123/play | usuário: `default` / senha: `changeme` (ou o que estiver em `.env`) |
+| **Kafka UI** (tópicos, schemas, connectors) | http://localhost:8080 | — (sem autenticação) |
+
 Requisitos e diagnóstico em
-[`docs/runbooks/local-environment.md`](docs/runbooks/local-environment.md)
-(runbook ainda placeholder — ver nota do bloqueio acima).
+[`docs/runbooks/local-environment.md`](docs/runbooks/local-environment.md).
 
 ### Schema + dados sintéticos (spike — enquanto `dhctl`/Kafka real não existem)
 
@@ -208,7 +210,9 @@ registrar em lugar central e sem conflito de merge
 | Etapa | Status |
 |---|---|
 | Fundação: ADRs, arquitetura, cenários, contratos, plano | **concluída** |
-| Fases 00-08: implementação | **não iniciada** |
+| Fase 00: bootstrap (estrutura Go, Makefile, contratos) | **concluída** |
+| Fase 01: ambiente local Docker Compose | **concluída** |
+| Fases 02-08: implementação (codegen, ingestão, relatórios) | em andamento |
 | Fase 09: validação no ClickHouse Cloud | opcional |
 
 Detalhe por fase e por tarefa: [`docs/plan/PROGRESS.md`](docs/plan/PROGRESS.md).
