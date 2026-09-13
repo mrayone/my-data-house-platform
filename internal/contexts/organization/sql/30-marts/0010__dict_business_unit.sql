@@ -13,6 +13,8 @@ CREATE DICTIONARY IF NOT EXISTS dh_core.dict__business_unit {ON_CLUSTER}
 )
 PRIMARY KEY bu_code
 SOURCE(CLICKHOUSE(
+    USER 'dh_dict'
+    PASSWORD ''
     QUERY 'SELECT bu_code, bu_name, channel, region, country, cost_center, active FROM dh_core.v_organization__business_unit_current'
 ))
 LAYOUT(COMPLEX_KEY_HASHED())

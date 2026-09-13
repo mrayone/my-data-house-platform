@@ -1,0 +1,19 @@
+<!--
+  Usuário interno para carregamento de dictionaries (CLICKHOUSE source).
+  Sem senha, acessível somente via socket local (127.0.0.1 / ::1).
+  Sem acesso de escrita — apenas leitura de views de L1.
+-->
+<clickhouse>
+    <users>
+        <dh_dict>
+            <password></password>
+            <networks>
+                <ip>127.0.0.1</ip>
+                <ip>::1</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+            <access_management>0</access_management>
+        </dh_dict>
+    </users>
+</clickhouse>

@@ -14,6 +14,8 @@ CREATE DICTIONARY IF NOT EXISTS dh_core.dict__discount_codes {ON_CLUSTER}
 )
 PRIMARY KEY discount_code
 SOURCE(CLICKHOUSE(
+    USER 'dh_dict'
+    PASSWORD ''
     QUERY 'SELECT discount_code, campaign_name, discount_type, discount_value, valid_from, valid_to, max_uses, business_unit_scope FROM dh_core.v_pricing__discount_codes_current'
 ))
 LAYOUT(COMPLEX_KEY_HASHED())
