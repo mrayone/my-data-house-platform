@@ -54,7 +54,7 @@ Se algo bloquear, registre em [Bloqueios](#bloqueios) **com o erro literal** e
 
 | Tarefa | Status | Data | Commit | Observação |
 |---|---|---|---|---|
-| P00-T01 — módulo Go e árvore de pacotes | `TODO` | | | |
+| P00-T01 — módulo Go e árvore de pacotes | `DONE` | 2026-09-13 | de414a5 | módulo `github.com/mrayone/my-data-house-platform`; go 1.27.1; logging/config/version + 3 `cmd/*` + `doc.go` dos 6 contextos |
 | P00-T02 — `Makefile` | `TODO` | | | |
 | P00-T03 — checks de fronteira de contexto | `TODO` | | | |
 | P00-T04 — CI e `CLAUDE.md` por contexto | `TODO` | | | |

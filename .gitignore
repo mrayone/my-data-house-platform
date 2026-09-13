@@ -1,0 +1,22 @@
+# Binários compilados
+/bin/
+
+# Segredos e configuração local
+.env
+*.env.local
+
+# Logs
+*.log
+
+# Cobertura de testes
+*.out
+coverage.txt
+coverage.html
+
+# Ferramentas de dev instaladas localmente (make tools)
+/tools/bin/
+
+# Artefatos de IDE/SO
+.DS_Store
+.idea/
+.vscode/
